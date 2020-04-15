@@ -1978,6 +1978,96 @@ declare module THREE {
         parse(json: any, texturePath?: string): { geometry: Geometry; materials?: Material[] };
     }
 
+    export class OBJLoader2Parser {
+
+        constructor();
+        callbacks: {
+            onProgress: Function;
+            onAssetAvailable: Function;
+            onError: Function;
+            onLoad: Function;
+        };
+        materials: {};
+
+        vertices: number[];
+        colors: number[];
+        normals: number[];
+        uvs: number[];
+
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+
+        setMaterialPerSmoothingGroup( materialPerSmoothingGroup: boolean );
+        setUseOAsMesh( useOAsMesh: boolean );
+        setUseIndices( useIndices: boolean );
+        setDisregardNormals( disregardNormals: boolean );
+
+        setCallbackOnAssetAvailable( onAssetAvailable: Function );
+        setCallbackOnProgress( onProgress: Function );
+        setCallbackOnError( onError: Function );
+        setCallbackOnLoad( onLoad: Function );
+        setLogging( enabled: boolean, debug: boolean );
+        setMaterials( materials: Object ): void;
+        execute( arrayBuffer: Uint8Array ): void;
+        executeLegacy( text: string ): void;
+
+    }
+
+    export class MaterialHandler {
+
+        constructor();
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+        callbacks: {
+            onLoadMaterials: Function;
+        };
+        materials: {};
+
+        createDefaultMaterials( overrideExisting: boolean ): void;
+        addMaterials( materials: {}, overrideExisting: boolean, newMaterials?: {} ): {};
+        addPayloadMaterials( materialPayload: {} ): {};
+        setLogging( enabled: boolean, debug: boolean ): void;
+        getMaterials(): {};
+        getMaterial( materialName: string ): Material;
+        getMaterialsJSON(): {};
+        clearMaterials(): void;
+
+    }
+
+    export class MeshReceiver {
+
+        constructor( materialHandler: MaterialHandler );
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+        callbacks: {
+            onParseProgress: Function;
+            onMeshAlter: Function;
+        };
+        materialHandler: MaterialHandler;
+
+        buildMeshes( meshPayload: {} ): Mesh[];
+        setLogging( enabled: boolean, debug: boolean ): void;
+
+    }
+
+    export class OBJLoader2 extends Loader {
+        constructor( manager?: LoadingManager );
+        parser: OBJLoader2Parser;
+        path: string;
+        resourcePath: string;
+        materialHandler: MaterialHandler;
+        meshReceiver: MeshReceiver;
+
+        load( url: string, onLoad: ( object3d: Object3D ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void, onMeshAlter?: ( meshData: {} ) => void ): void;
+        parse( content: ArrayBuffer | string ): Object3D;
+    }
+
     /**
      * Handles and keeps track of loaded and pending data.
      */

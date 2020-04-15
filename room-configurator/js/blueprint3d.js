@@ -2534,6 +2534,7 @@ var BP3D;
                 // init item loader
                 this.loader = new THREE.JSONLoader();
                 this.loader.crossOrigin = '';
+                this.loader2 = new THREE.OBJLoader2();
             }
             /** Adds a non-item, basically a mesh, to the scene.
              * @param mesh The mesh to be added.
