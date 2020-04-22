@@ -825,7 +825,6 @@ declare module BP3D.Model {
         needsUpdate: boolean;
         /** The Json loader. */
         private loader;
-        private loader2;
         /** */
         private itemLoadingCallbacks;
         /** Item */
