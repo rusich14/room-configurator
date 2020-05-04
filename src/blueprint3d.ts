@@ -23,7 +23,7 @@ module BP3D {
 
   /** Blueprint3D core application. */
   export class Blueprint3d {
-    
+
     private model: Model.Model;
 
     private three: any; // Three.Main;

@@ -20,6 +20,8 @@ module BP3D.Model {
 
     /** The Json loader. */
     private loader: THREE.JSONLoader;
+    private objLoader: THREE.OBJLoader2;
+    private mtlLoader: THREE.MTLLoader;
 
     /** */
     private itemLoadingCallbacks = $.Callbacks();
@@ -41,6 +43,8 @@ module BP3D.Model {
       // init item loader
       this.loader = new THREE.JSONLoader();
       this.loader.crossOrigin = '';
+      this.objLoader = new THREE.OBJLoader2();
+      this.mtlLoader = new THREE.MTLLoader();
     }
 
     /** Adds a non-item, basically a mesh, to the scene.
@@ -118,26 +122,72 @@ module BP3D.Model {
     public addItem(itemType: number, fileName: string, metadata, position: THREE.Vector3, rotation: number, scale: THREE.Vector3, fixed: boolean) {
       itemType = itemType || 1;
       var scope = this;
-      var loaderCallback = function (geometry: THREE.Geometry, materials: THREE.Material[]) {
-        var item = new (Items.Factory.getClass(itemType))(
-          scope.model,
-          metadata, geometry,
-          new THREE.MeshFaceMaterial(materials),
-          position, rotation, scale
-        );
-        item.fixed = fixed || false;
-        scope.items.push(item);
-        scope.add(item);
-        item.initObject();
-        scope.itemLoadedCallbacks.fire(item);
-      };
+      var result = fileName.match(/\.obj|\.js/);
 
-      this.itemLoadingCallbacks.fire();
-      this.loader.load(
-        fileName,
-        loaderCallback,
-        undefined // TODO_Ekki
-      );
+      switch (result[0]) {
+        case '.js':
+          var loaderCallback = function (geometry: THREE.Geometry, materials: THREE.Material[]) {
+            var item = new (Items.Factory.getClass(itemType))(
+              scope.model,
+              metadata, geometry,
+              new THREE.MeshFaceMaterial(materials),
+              position, rotation, scale
+            );
+
+            console.log('=====> item: ', item);
+            item.fixed = fixed || false;
+            scope.items.push(item);
+            scope.add(item);
+            item.initObject();
+            scope.itemLoadedCallbacks.fire(item);
+          };
+
+          this.itemLoadingCallbacks.fire();
+          this.loader.load(
+            fileName,
+            loaderCallback,
+            undefined // TODO_Ekki
+          );
+          break;
+        case '.obj':
+          var splittedFileName = fileName.split('/');
+          var urlObj = {
+            models: splittedFileName[0],
+            objects: splittedFileName[1],
+            fileDir: splittedFileName[2],
+            file: splittedFileName[3],
+            fileName: splittedFileName[3].substr(0,fileName.length - 4)
+          };
+          var url = fileName.substr(0,fileName.length - 4);
+          this.mtlLoader.load(`${url}.mtl`, (mtlParseResult) => {
+            if (mtlParseResult instanceof THREE.MTLLoader.MaterialCreator) {
+              var materials = THREE.MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
+
+              // materials.side = THREE.DoubleSide;
+              this.objLoader.addMaterials(materials, true);
+
+              this.objLoader.load(`${url}.obj`, (root) => {
+                if (mtlParseResult instanceof THREE.MTLLoader.MaterialCreator) {
+                  this.scene.add(root);
+
+                  var item = new (Items.Factory.getClass(itemType))(
+                    // scope.model,
+                    // metadata, geometry,
+                    // new THREE.MeshFaceMaterial(materials),
+                    // position, rotation, scale
+                  );
+
+                  item.fixed = fixed || false;
+                  scope.items.push(item);
+                  scope.add(item);
+                  item.initObject();
+                  scope.itemLoadedCallbacks.fire(item);
+                }
+              });
+            }
+          });
+          break;
+      }
     }
   }
 }

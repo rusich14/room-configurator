@@ -4,17 +4,12 @@
 /// <reference path="metadata.ts" />
 
 module BP3D.Items {
-  /**
-   * A Floor Item is an entity to be placed related to a floor.
-   */
+  // A Floor Item is an entity to be placed related to a floor.
   export abstract class DeviceItem extends Item {
     constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super(model, metadata, geometry, material, position, rotation, scale);
-
-      // console.log('=====> DeviceItem');
     };
 
-    /** */
     public placeInRoom() {
       if (!this.position_set) {
         var center = this.model.floorplan.getCenter();
@@ -28,7 +23,6 @@ module BP3D.Items {
     public resized() {
     }
 
-    /** */
     public moveToPosition(vec3, intersection) {
       // keeps the position in the room and on the floor
       if (!this.isValidPosition(vec3)) {
@@ -41,7 +35,6 @@ module BP3D.Items {
       }
     }
 
-    /** */
     public isValidPosition(vec3): boolean {
       var corners = this.getCorners('x', 'z', vec3);
 

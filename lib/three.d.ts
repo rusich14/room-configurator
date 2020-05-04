@@ -1978,6 +1978,230 @@ declare module THREE {
         parse(json: any, texturePath?: string): { geometry: Geometry; materials?: Material[] };
     }
 
+    export class OBJLoader2Parser {
+        constructor();
+
+        callbacks: {
+            onProgress: Function;
+            onAssetAvailable: Function;
+            onError: Function;
+            onLoad: Function;
+        };
+        contentRef: Uint8Array;
+        legacyMode: boolean;
+        materials: {};
+        materialPerSmoothingGroup: boolean;
+        useOAsMesh: boolean;
+        useIndices: boolean;
+        disregardNormals: boolean;
+
+        vertices: number[];
+        colors: number[];
+        normals: number[];
+        uvs: number[];
+
+        rawMesh: {
+            objectName: string;
+            groupName: string;
+            activeMtlName: string;
+            mtllibName: string;
+            faceType: number;
+            subGroups: {}[];
+            subGroupInUse: {};
+            smoothingGroup: {
+                splitMaterials: boolean;
+                normalized: boolean;
+                real: boolean;
+            };
+            counts: {
+                doubleIndicesCount: number;
+                faceCount: number;
+                mtlCount: number;
+                smoothingGroupCount: number;
+            }
+        };
+
+        inputObjectCount: number;
+        outputObjectCount: number;
+        globalCounts: {
+            vertices: number;
+            faces: number;
+            doubleIndicesCount: number;
+            lineByte: number;
+            currentByte: number;
+            totalBytes: number;
+        };
+
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+
+        setMaterialPerSmoothingGroup( materialPerSmoothingGroup: boolean ): {};
+        setUseOAsMesh( useOAsMesh: boolean ): {};
+        setUseIndices( useIndices: boolean ): {};
+        setDisregardNormals( disregardNormals: boolean ): {};
+
+        setCallbackOnAssetAvailable( onAssetAvailable: Function ): {};
+        setCallbackOnProgress( onProgress: Function ): {};
+        setCallbackOnError( onError: Function ): {};
+        setCallbackOnLoad( onLoad: Function ): {};
+        setLogging( enabled: boolean, debug: boolean ): {};
+        setMaterials( materials: Object ): void;
+        execute( arrayBuffer: Uint8Array ): void;
+        executeLegacy( text: string ): void;
+    }
+
+    export class MaterialHandler {
+        constructor();
+
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+        callbacks: {
+            onLoadMaterials: Function;
+        };
+        materials: {};
+
+        createDefaultMaterials( overrideExisting: boolean ): void;
+        addMaterials( materials: {}, overrideExisting: boolean, newMaterials?: {} ): {};
+        addPayloadMaterials( materialPayload: {} ): {};
+        setLogging( enabled: boolean, debug: boolean ): void;
+        getMaterials(): {};
+        getMaterial( materialName: string ): Material;
+        getMaterialsJSON(): {};
+        clearMaterials(): void;
+    }
+
+    export class MeshReceiver {
+        constructor( materialHandler: MaterialHandler );
+
+        logging: {
+            enabled: boolean;
+            debug: boolean;
+        };
+        callbacks: {
+            onParseProgress: Function;
+            onMeshAlter: Function;
+        };
+        materialHandler: MaterialHandler;
+
+        buildMeshes( meshPayload: {} ): Mesh[];
+        setLogging( enabled: boolean, debug: boolean ): void;
+
+    }
+
+    export interface MaterialCreatorOptions {
+        side?: Side;
+        wrap?: Wrapping;
+        normalizeRGB?: boolean;
+        ignoreZeroRGBs?: boolean;
+        invertTrProperty?: boolean;
+    }
+
+    export class MTLLoader extends Loader {
+        constructor( manager?: LoadingManager );
+
+        materialOptions: MaterialCreatorOptions;
+
+        load( url: string, onLoad: ( materialCreator: MTLLoader.MaterialCreator ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+        parse( text: string, path: string ) : MTLLoader.MaterialCreator;
+        setMaterialOptions( value: MaterialCreatorOptions ) : void;
+
+    }
+
+    export interface MaterialInfo {
+        ks?: number[];
+        kd?: number[];
+        ke?: number[];
+        map_kd?: string;
+        map_ks?: string;
+        map_ke?: string;
+        norm?: string;
+        map_bump?: string;
+        bump?: string;
+        map_d?: string;
+        ns?: number;
+        d?: number;
+        tr?: number;
+    }
+
+    export interface TexParams {
+        scale: Vector2;
+        offset: Vector2;
+        url: string;
+    }
+
+    export namespace MtlObjBridge {
+        export function link( processResult: {}, assetLoader: {} ): void;
+        export function addMaterialsFromMtlLoader( materialCreator: MTLLoader.MaterialCreator ): {};
+    }
+
+    export namespace MTLLoader {
+        export class MaterialCreator {
+            constructor( baseUrl?: string, options?: MaterialCreatorOptions );
+
+            baseUrl : string;
+            options : MaterialCreatorOptions;
+            materialsInfo : {[key: string]: MaterialInfo};
+            materials : {[key: string]: Material};
+            private materialsArray : Material[];
+            nameLookup : {[key: string]: number};
+            side : Side;
+            wrap : Wrapping;
+            crossOrigin : string;
+
+            setCrossOrigin( value: string ) : {};
+            setManager( value: LoadingManager ) : void;
+            setMaterials( materialsInfo: {[key: string]: MaterialInfo} ) : void;
+            convert( materialsInfo: {[key: string]: MaterialInfo} ) : {[key: string]: MaterialInfo};
+            preload() : void;
+            getIndex( materialName: string ) : Material;
+            getAsArray() : Material[];
+            create( materialName: string ) : Material;
+            createMaterial_( materialName: string ) : Material;
+            getTextureParams( value: string, matParams: any ) : TexParams;
+            loadTexture( url: string, mapping?: Mapping, onLoad?: ( bufferGeometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): Texture;
+
+        }
+    }
+
+    export class OBJLoader2 extends Loader {
+        constructor( manager?: LoadingManager );
+
+        parser: OBJLoader2Parser;
+        modelName: string;
+        instanceNo: number;
+        path: string;
+        resourcePath: string;
+        baseObject3d: Object3D;
+        materialHandler: MaterialHandler;
+        meshReceiver: MeshReceiver;
+
+        setLogging( enabled: boolean, debug: boolean ): {};
+        setMaterialPerSmoothingGroup( materialPerSmoothingGroup: boolean ): {};
+        setUseOAsMesh( useOAsMesh: boolean ): {};
+        setUseIndices( useIndices: boolean ): {};
+        setDisregardNormals( disregardNormals: boolean ): {};
+
+        setModelName( modelName: string ): {};
+        setPath( path: string ): {};
+        setResourcePath( path: string ): {};
+        setBaseObject3d( baseObject3d: Object3D ): {};
+        addMaterials( materials: {}, overrideExisting: boolean ): {};
+
+        setCallbackOnAssetAvailable( onAssetAvailable: Function ): {};
+        setCallbackOnProgress( onProgress: Function ): {};
+        setCallbackOnError( onError: Function ): {};
+        setCallbackOnLoad( onLoad: Function ): {};
+        setCallbackOnMeshAlter( onMeshAlter: Function ): {};
+        setCallbackOnLoadMaterials( onLoadMaterials: Function ): {};
+
+        load( url: string, onLoad: ( object3d: Object3D ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void, onMeshAlter?: ( meshData: {} ) => void ): void;
+        parse( content: ArrayBuffer | string ): Object3D;
+    }
+
     /**
      * Handles and keeps track of loaded and pending data.
      */

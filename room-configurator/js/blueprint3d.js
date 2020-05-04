@@ -400,7 +400,6 @@ var BP3D;
 })(BP3D || (BP3D = {}));
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../core/utils.ts" />
-/// <reference path="../model/model.ts" />
 /// <reference path="metadata.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -411,10 +410,6 @@ var BP3D;
 (function (BP3D) {
     var Items;
     (function (Items) {
-        /**
-         * An Item is an abstract entity for all things placed in the scene,
-         * e.g. at walls or on the floor.
-         */
         var Item = (function (_super) {
             __extends(Item, _super);
             /** Constructs an item.
@@ -430,46 +425,36 @@ var BP3D;
                 _super.call(this);
                 this.model = model;
                 this.metadata = metadata;
-                /** */
                 this.errorGlow = new THREE.Mesh();
-                /** */
                 this.hover = false;
-                /** */
                 this.selected = false;
-                /** */
                 this.highlighted = false;
-                /** */
                 this.error = false;
-                /** */
                 this.emissiveColor = 0x444444;
-                /** */
                 this.errorColor = 0xff0000;
                 /** Does this object affect other floor items */
                 this.obstructFloorMoves = true;
                 /** Show rotate option in context menu */
                 this.allowRotate = true;
-                /** */
                 this.fixed = false;
                 /** dragging */
                 this.dragOffset = new THREE.Vector3();
-                /** */
                 this.getHeight = function () {
                     return this.halfSize.y * 2.0;
                 };
-                /** */
                 this.getWidth = function () {
                     return this.halfSize.x * 2.0;
                 };
-                /** */
                 this.getDepth = function () {
                     return this.halfSize.z * 2.0;
                 };
-                /** */
                 this.initObject = function () {
                     this.placeInRoom();
                     // select and stuff
                     this.scene.needsUpdate = true;
                 };
+                console.log('=====> model: ', model);
+                console.log('=====> this: ', this);
                 this.scene = this.model.scene;
                 this.geometry = geometry;
                 this.material = material;
@@ -499,19 +484,16 @@ var BP3D;
                 }
             }
             ;
-            /** */
             Item.prototype.remove = function () {
                 this.scene.removeItem(this);
             };
             ;
-            /** */
             Item.prototype.resize = function (height, width, depth) {
                 var x = width / this.getWidth();
                 var y = height / this.getHeight();
                 var z = depth / this.getDepth();
                 this.setScale(x, y, z);
             };
-            /** */
             Item.prototype.setScale = function (x, y, z) {
                 var scaleVec = new THREE.Vector3(x, y, z);
                 this.halfSize.multiply(scaleVec);
@@ -521,11 +503,9 @@ var BP3D;
                 this.scene.needsUpdate = true;
             };
             ;
-            /** */
             Item.prototype.setFixed = function (fixed) {
                 this.fixed = fixed;
             };
-            /** */
             Item.prototype.removed = function () {
             };
             /** on is a bool */
@@ -538,25 +518,21 @@ var BP3D;
                     material.emissive.setHex(hex);
                 });
             };
-            /** */
             Item.prototype.mouseOver = function () {
                 this.hover = true;
                 this.updateHighlight();
             };
             ;
-            /** */
             Item.prototype.mouseOff = function () {
                 this.hover = false;
                 this.updateHighlight();
             };
             ;
-            /** */
             Item.prototype.setSelected = function () {
                 this.selected = true;
                 this.updateHighlight();
             };
             ;
-            /** */
             Item.prototype.setUnselected = function () {
                 this.selected = false;
                 this.updateHighlight();
@@ -567,14 +543,12 @@ var BP3D;
                 this.dragOffset.copy(intersection.point).sub(this.position);
             };
             ;
-            /** */
             Item.prototype.clickDragged = function (intersection) {
                 if (intersection) {
                     this.moveToPosition(intersection.point.sub(this.dragOffset), intersection);
                 }
             };
             ;
-            /** */
             Item.prototype.rotate = function (intersection) {
                 if (intersection) {
                     var angle = BP3D.Core.Utils.angle(0, 1, intersection.point.x - this.position.x, intersection.point.z - this.position.z);
@@ -589,11 +563,9 @@ var BP3D;
                     this.rotation.y = angle;
                 }
             };
-            /** */
             Item.prototype.moveToPosition = function (vec3, intersection) {
                 this.position.copy(vec3);
             };
-            /** */
             Item.prototype.clickReleased = function () {
                 if (this.error) {
                     this.hideError();
@@ -643,7 +615,6 @@ var BP3D;
                 ];
                 return corners;
             };
-            /** */
             Item.prototype.showError = function (vec3) {
                 vec3 = vec3 || this.position;
                 if (!this.error) {
@@ -653,20 +624,17 @@ var BP3D;
                 }
                 this.errorGlow.position.copy(vec3);
             };
-            /** */
             Item.prototype.hideError = function () {
                 if (this.error) {
                     this.error = false;
                     this.scene.remove(this.errorGlow);
                 }
             };
-            /** */
             Item.prototype.objectHalfSize = function () {
                 var objectBox = new THREE.Box3();
                 objectBox.setFromObject(this);
                 return objectBox.max.clone().sub(objectBox.min).divideScalar(2);
             };
-            /** */
             Item.prototype.createGlow = function (color, opacity, ignoreDepth) {
                 ignoreDepth = ignoreDepth || false;
                 opacity = opacity || 0.2;
@@ -2325,17 +2293,14 @@ var BP3D;
 (function (BP3D) {
     var Items;
     (function (Items) {
-        /**
-         * A Floor Item is an entity to be placed related to a floor.
-         */
+        debugger;
+        // A Floor Item is an entity to be placed related to a floor.
         var DeviceItem = (function (_super) {
             __extends(DeviceItem, _super);
             function DeviceItem(model, metadata, geometry, material, position, rotation, scale) {
                 _super.call(this, model, metadata, geometry, material, position, rotation, scale);
-                // console.log('=====> DeviceItem');
             }
             ;
-            /** */
             DeviceItem.prototype.placeInRoom = function () {
                 if (!this.position_set) {
                     var center = this.model.floorplan.getCenter();
@@ -2348,7 +2313,6 @@ var BP3D;
             /** Take action after a resize */
             DeviceItem.prototype.resized = function () {
             };
-            /** */
             DeviceItem.prototype.moveToPosition = function (vec3, intersection) {
                 // keeps the position in the room and on the floor
                 if (!this.isValidPosition(vec3)) {
@@ -2361,7 +2325,6 @@ var BP3D;
                     this.position.copy(vec3);
                 }
             };
-            /** */
             DeviceItem.prototype.isValidPosition = function (vec3) {
                 var corners = this.getCorners('x', 'z', vec3);
                 // check if we are in a room
@@ -2534,8 +2497,8 @@ var BP3D;
                 // init item loader
                 this.loader = new THREE.JSONLoader();
                 this.loader.crossOrigin = '';
-
-                var loader2 = new THREE.OBJLoader2();
+                this.objLoader = new THREE.OBJLoader2();
+                this.mtlLoader = new THREE.MTLLoader();
             }
             /** Adds a non-item, basically a mesh, to the scene.
              * @param mesh The mesh to be added.
@@ -2603,19 +2566,55 @@ var BP3D;
              * @param fixed True if fixed.
              */
             Scene.prototype.addItem = function (itemType, fileName, metadata, position, rotation, scale, fixed) {
+                var _this = this;
                 itemType = itemType || 1;
                 var scope = this;
-                var loaderCallback = function (geometry, materials) {
-                    var item = new (BP3D.Items.Factory.getClass(itemType))(scope.model, metadata, geometry, new THREE.MeshFaceMaterial(materials), position, rotation, scale);
-                    item.fixed = fixed || false;
-                    scope.items.push(item);
-                    scope.add(item);
-                    item.initObject();
-                    scope.itemLoadedCallbacks.fire(item);
-                };
-                this.itemLoadingCallbacks.fire();
-                this.loader.load(fileName, loaderCallback, undefined // TODO_Ekki
-                );
+                var result = fileName.match(/\.obj|\.js/);
+                switch (result[0]) {
+                    case '.js':
+                        var loaderCallback = function (geometry, materials) {
+                            var item = new (BP3D.Items.Factory.getClass(itemType))(scope.model, metadata, geometry, new THREE.MeshFaceMaterial(materials), position, rotation, scale);
+                            console.log('=====> item: ', item);
+                            item.fixed = fixed || false;
+                            scope.items.push(item);
+                            scope.add(item);
+                            item.initObject();
+                            scope.itemLoadedCallbacks.fire(item);
+                        };
+                        this.itemLoadingCallbacks.fire();
+                        this.loader.load(fileName, loaderCallback, undefined // TODO_Ekki
+                        );
+                        break;
+                    case '.obj':
+                        var splittedFileName = fileName.split('/');
+                        var urlObj = {
+                            models: splittedFileName[0],
+                            objects: splittedFileName[1],
+                            fileDir: splittedFileName[2],
+                            file: splittedFileName[3],
+                            fileName: splittedFileName[3].substr(0, fileName.length - 4)
+                        };
+                        var url = fileName.substr(0, fileName.length - 4);
+                        this.mtlLoader.load(url + ".mtl", function (mtlParseResult) {
+                            if (mtlParseResult instanceof THREE.MTLLoader.MaterialCreator) {
+                                var materials = THREE.MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
+                                // materials.side = THREE.DoubleSide;
+                                _this.objLoader.addMaterials(materials, true);
+                                _this.objLoader.load(url + ".obj", function (root) {
+                                    if (mtlParseResult instanceof THREE.MTLLoader.MaterialCreator) {
+                                        _this.scene.add(root);
+                                        var item = new (BP3D.Items.Factory.getClass(itemType))();
+                                        item.fixed = fixed || false;
+                                        scope.items.push(item);
+                                        scope.add(item);
+                                        item.initObject();
+                                        scope.itemLoadedCallbacks.fire(item);
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                }
             };
             return Scene;
         })();
@@ -2634,17 +2633,10 @@ var BP3D;
          * A Model connects a Floorplan and a Scene.
          */
         var Model = (function () {
-            /** Constructs a new model.
-             * @param textureDir The directory containing the textures.
-             */
             function Model(textureDir) {
-                /** */
                 this.roomLoadingCallbacks = $.Callbacks();
-                /** */
                 this.roomLoadedCallbacks = $.Callbacks();
-                /** name */
                 this.roomSavedCallbacks = $.Callbacks();
-                /** success (bool), copy (bool) */
                 this.roomDeletedCallbacks = $.Callbacks();
                 this.floorplan = new Model_1.Floorplan();
                 this.scene = new Model_1.Scene(this, textureDir);

@@ -1,60 +1,27 @@
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../core/utils.ts" />
-/// <reference path="../model/model.ts" />
 /// <reference path="metadata.ts" />
 
 module BP3D.Items {
-  /**
-   * An Item is an abstract entity for all things placed in the scene,
-   * e.g. at walls or on the floor.
-   */
   export abstract class Item extends THREE.Mesh {
-
-    /** */
     private scene: Model.Scene;
-
-    /** */
     private errorGlow = new THREE.Mesh();
-
-    /** */
     private hover = false;
-
-    /** */
     private selected = false;
-
-    /** */
     private highlighted = false;
-
-    /** */
     private error = false;
-
-    /** */
     private emissiveColor = 0x444444;
-
-    /** */
     private errorColor = 0xff0000;
-
-    /** */
     private resizable: boolean;
-
     /** Does this object affect other floor items */
     public obstructFloorMoves = true;
-
-    /** */
     protected position_set: boolean;
-
     /** Show rotate option in context menu */
     protected allowRotate = true;
-
-    /** */
     public fixed = false;
-
     /** dragging */
     private dragOffset = new THREE.Vector3();
-
-    /** */
     public halfSize: THREE.Vector3;
-
     /** Constructs an item.
      * @param model TODO
      * @param metadata TODO
@@ -66,6 +33,9 @@ module BP3D.Items {
      */
     constructor(protected model: Model.Model, public metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super();
+
+      console.log('=====> model: ', model);
+      console.log('=====> this: ', this);
 
       this.scene = this.model.scene;
       this.geometry = geometry;
@@ -107,12 +77,10 @@ module BP3D.Items {
       }
     };
 
-    /** */
     public remove() {
       this.scene.removeItem(this);
     };
 
-    /** */
     public resize(height: number, width: number, depth: number) {
       var x = width / this.getWidth();
       var y = height / this.getHeight();
@@ -120,7 +88,6 @@ module BP3D.Items {
       this.setScale(x, y, z);
     }
 
-    /** */
     public setScale(x: number, y: number, z: number) {
       var scaleVec = new THREE.Vector3(x, y, z);
       this.halfSize.multiply(scaleVec);
@@ -130,7 +97,6 @@ module BP3D.Items {
       this.scene.needsUpdate = true;
     };
 
-    /** */
     public setFixed(fixed: boolean) {
       this.fixed = fixed;
     }
@@ -138,32 +104,26 @@ module BP3D.Items {
     /** Subclass can define to take action after a resize. */
     protected abstract resized();
 
-    /** */
     public getHeight = function () {
       return this.halfSize.y * 2.0;
     };
 
-    /** */
     public getWidth = function () {
       return this.halfSize.x * 2.0;
     };
 
-    /** */
     public getDepth = function () {
       return this.halfSize.z * 2.0;
     };
 
-    /** */
     public abstract placeInRoom();
 
-    /** */
     public initObject = function () {
       this.placeInRoom();
       // select and stuff
       this.scene.needsUpdate = true;
     };
 
-    /** */
     public removed() {
     }
 
@@ -178,25 +138,21 @@ module BP3D.Items {
       });
     }
 
-    /** */
     public mouseOver() {
       this.hover = true;
       this.updateHighlight();
     };
 
-    /** */
     public mouseOff() {
       this.hover = false;
       this.updateHighlight();
     };
 
-    /** */
     public setSelected() {
       this.selected = true;
       this.updateHighlight();
     };
 
-    /** */
     public setUnselected() {
       this.selected = false;
       this.updateHighlight();
@@ -207,7 +163,6 @@ module BP3D.Items {
       this.dragOffset.copy(intersection.point).sub(this.position);
     };
 
-    /** */
     public clickDragged(intersection) {
       if (intersection) {
         this.moveToPosition(
@@ -216,7 +171,6 @@ module BP3D.Items {
       }
     };
 
-    /** */
     public rotate(intersection) {
       if (intersection) {
         var angle = Core.Utils.angle(
@@ -239,12 +193,10 @@ module BP3D.Items {
       }
     }
 
-    /** */
     public moveToPosition(vec3, intersection) {
       this.position.copy(vec3);
     }
 
-    /** */
     public clickReleased() {
       if (this.error) {
         this.hideError();
@@ -306,10 +258,8 @@ module BP3D.Items {
       return corners;
     }
 
-    /** */
     public abstract isValidPosition(vec3): boolean;
 
-    /** */
     public showError(vec3) {
       vec3 = vec3 || this.position;
       if (!this.error) {
@@ -320,22 +270,18 @@ module BP3D.Items {
       this.errorGlow.position.copy(vec3);
     }
 
-    /** */
     public hideError() {
       if (this.error) {
         this.error = false;
         this.scene.remove(this.errorGlow);
       }
     }
-
-    /** */
     private objectHalfSize(): THREE.Vector3 {
       var objectBox = new THREE.Box3();
       objectBox.setFromObject(this);
       return objectBox.max.clone().sub(objectBox.min).divideScalar(2);
     }
 
-    /** */
     public createGlow(color, opacity, ignoreDepth): THREE.Mesh {
       ignoreDepth = ignoreDepth || false;
       opacity = opacity || 0.2;

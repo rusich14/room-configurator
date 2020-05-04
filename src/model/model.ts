@@ -4,32 +4,22 @@
 /// <reference path="scene.ts" />
 
 module BP3D.Model {
-  /** 
-   * A Model connects a Floorplan and a Scene. 
+  /**
+   * A Model connects a Floorplan and a Scene.
    */
   export class Model {
-
-    /** */
     public floorplan: Floorplan;
 
-    /** */
     public scene: Scene;
 
-    /** */
     private roomLoadingCallbacks = $.Callbacks();
 
-    /** */
     private roomLoadedCallbacks = $.Callbacks();
 
-    /** name */
     private roomSavedCallbacks = $.Callbacks();
 
-    /** success (bool), copy (bool) */
     private roomDeletedCallbacks = $.Callbacks();
 
-    /** Constructs a new model.
-     * @param textureDir The directory containing the textures.
-     */
     constructor(textureDir: string) {
       this.floorplan = new Floorplan();
       this.scene = new Scene(this, textureDir);

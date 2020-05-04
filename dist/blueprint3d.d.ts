@@ -135,42 +135,26 @@ declare module BP3D.Items {
     }
 }
 declare module BP3D.Items {
-    /**
-     * An Item is an abstract entity for all things placed in the scene,
-     * e.g. at walls or on the floor.
-     */
     abstract class Item extends THREE.Mesh {
         protected model: Model.Model;
         metadata: Metadata;
-        /** */
         private scene;
-        /** */
         private errorGlow;
-        /** */
         private hover;
-        /** */
         private selected;
-        /** */
         private highlighted;
-        /** */
         private error;
-        /** */
         private emissiveColor;
-        /** */
         private errorColor;
-        /** */
         private resizable;
         /** Does this object affect other floor items */
         obstructFloorMoves: boolean;
-        /** */
         protected position_set: boolean;
         /** Show rotate option in context menu */
         protected allowRotate: boolean;
-        /** */
         fixed: boolean;
         /** dragging */
         private dragOffset;
-        /** */
         halfSize: THREE.Vector3;
         /** Constructs an item.
          * @param model TODO
@@ -182,47 +166,29 @@ declare module BP3D.Items {
          * @param scale TODO
          */
         constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3);
-        /** */
         remove(): void;
-        /** */
         resize(height: number, width: number, depth: number): void;
-        /** */
         setScale(x: number, y: number, z: number): void;
-        /** */
         setFixed(fixed: boolean): void;
         /** Subclass can define to take action after a resize. */
         protected abstract resized(): any;
-        /** */
         getHeight: () => number;
-        /** */
         getWidth: () => number;
-        /** */
         getDepth: () => number;
-        /** */
         abstract placeInRoom(): any;
-        /** */
         initObject: () => void;
-        /** */
         removed(): void;
         /** on is a bool */
         updateHighlight(): void;
-        /** */
         mouseOver(): void;
-        /** */
         mouseOff(): void;
-        /** */
         setSelected(): void;
-        /** */
         setUnselected(): void;
         /** intersection has attributes point (vec3) and object (THREE.Mesh) */
         clickPressed(intersection: any): void;
-        /** */
         clickDragged(intersection: any): void;
-        /** */
         rotate(intersection: any): void;
-        /** */
         moveToPosition(vec3: any, intersection: any): void;
-        /** */
         clickReleased(): void;
         /**
          * Returns an array of planes to use other than the ground plane
@@ -240,15 +206,10 @@ declare module BP3D.Items {
             x: number;
             y: number;
         }[];
-        /** */
         abstract isValidPosition(vec3: any): boolean;
-        /** */
         showError(vec3: any): void;
-        /** */
         hideError(): void;
-        /** */
         private objectHalfSize();
-        /** */
         createGlow(color: any, opacity: any, ignoreDepth: any): THREE.Mesh;
     }
 }
@@ -775,18 +736,12 @@ declare module BP3D.Items {
     }
 }
 declare module BP3D.Items {
-    /**
-     * A Floor Item is an entity to be placed related to a floor.
-     */
     abstract class DeviceItem extends Item {
         constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3);
-        /** */
         placeInRoom(): void;
         /** Take action after a resize */
         resized(): void;
-        /** */
         moveToPosition(vec3: any, intersection: any): void;
-        /** */
         isValidPosition(vec3: any): boolean;
         spaceCheck(): void;
     }
@@ -825,6 +780,8 @@ declare module BP3D.Model {
         needsUpdate: boolean;
         /** The Json loader. */
         private loader;
+        private objLoader;
+        private mtlLoader;
         /** */
         private itemLoadingCallbacks;
         /** Item */
@@ -883,21 +840,12 @@ declare module BP3D.Model {
      * A Model connects a Floorplan and a Scene.
      */
     class Model {
-        /** */
         floorplan: Floorplan;
-        /** */
         scene: Scene;
-        /** */
         private roomLoadingCallbacks;
-        /** */
         private roomLoadedCallbacks;
-        /** name */
         private roomSavedCallbacks;
-        /** success (bool), copy (bool) */
         private roomDeletedCallbacks;
-        /** Constructs a new model.
-         * @param textureDir The directory containing the textures.
-         */
         constructor(textureDir: string);
         private loadSerialized(json);
         private exportSerialized();
